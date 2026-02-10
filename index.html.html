@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SEC | Life Saving Rules Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary:#1a5276; --primary-dark:#0e2f44;
+    --accent:#e67e22; --accent-glow:#f39c12;
+    --correct:#27ae60; --correct-bg:rgba(39,174,96,.15);
+    --wrong:#e74c3c; --wrong-bg:rgba(231,76,60,.15);
+    --text:#ecf0f1; --text-muted:#95a5a6;
+    --card-bg:rgba(255,255,255,.07); --card-border:rgba(255,255,255,.1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:'Tajawal',sans-serif;min-height:100vh;overflow-x:hidden;color:var(--text);
+    background:linear-gradient(145deg,#0a1628 0%,#112240 40%,#1a3a5c 100%);
+  }
+  .bg-pattern{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+  .bg-pattern::before{
+    content:'';position:absolute;top:-50%;right:-30%;width:600px;height:600px;border-radius:50%;
+    background:radial-gradient(circle,rgba(230,126,34,.08) 0%,transparent 70%);
+    animation:floatOrb 15s ease-in-out infinite;
+  }
+  .bg-pattern::after{
+    content:'';position:absolute;bottom:-30%;left:-20%;width:500px;height:500px;border-radius:50%;
+    background:radial-gradient(circle,rgba(26,82,118,.15) 0%,transparent 70%);
+    animation:floatOrb 20s ease-in-out infinite reverse;
+  }
+  @keyframes floatOrb{
+    0%,100%{transform:translate(0,0) scale(1)}
+    33%{transform:translate(40px,-30px) scale(1.1)}
+    66%{transform:translate(-20px,20px) scale(.95)}
+  }
+  .app{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:18px 14px 36px}
+
+  /* top bar */
+  .topbar{
+    display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:14px;
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);
+    border-radius:16px;padding:12px 14px;backdrop-filter:blur(10px);
+  }
+  .brand{
+    display:flex;flex-direction:column;gap:2px
+  }
+  .brand .sec{font-weight:900;letter-spacing:.5px}
+  .brand .sub{color:var(--text-muted);font-size:12px;font-weight:600}
+  .controls{display:flex;gap:10px;align-items:center}
+  select{
+    font-family:'Tajawal',sans-serif;font-weight:700;
+    background:rgba(255,255,255,.06);color:var(--text);
+    border:1px solid rgba(255,255,255,.12);border-radius:12px;
+    padding:10px 12px;outline:none;cursor:pointer
+  }
+  option{color:#111}
+  .pill{
+    background:linear-gradient(135deg,var(--accent),#d35400);
+    border:none;color:#fff;font-weight:900;border-radius:999px;
+    padding:10px 14px;cursor:pointer;box-shadow:0 4px 15px rgba(230,126,34,.28);
+  }
+
+  /* header */
+  .header{text-align:center;margin:14px 0 22px;animation:slideDown .7s ease-out}
+  @keyframes slideDown{from{opacity:0;transform:translateY(-25px)}to{opacity:1;transform:translateY(0)}}
+  .badge{
+    display:inline-flex;align-items:center;gap:10px;
+    background:linear-gradient(135deg,var(--accent),#d35400);
+    padding:8px 18px;border-radius:999px;font-weight:900;
+    box-shadow:0 4px 20px rgba(230,126,34,.35);
+    animation:pulseGlow 3s ease-in-out infinite;
+  }
+  @keyframes pulseGlow{0%,100%{box-shadow:0 4px 20px rgba(230,126,34,.35)}50%{box-shadow:0 4px 30px rgba(230,126,34,.55)}}
+  .badge .num{
+    background:#fff;color:var(--accent);width:30px;height:30px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-weight:900
+  }
+  h1{
+    margin:10px 0 6px;font-size:26px;font-weight:900;
+    background:linear-gradient(90deg,#fff,#d4e6f1);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  }
+  .desc{color:var(--text-muted);font-size:14px;font-weight:600;line-height:1.7}
+
+  /* rules menu */
+  .rules{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;
+  }
+  .ruleBtn{
+    text-align:right;cursor:pointer;padding:14px 14px;border-radius:16px;
+    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+    color:var(--text);font-weight:800;transition:.25s;position:relative;overflow:hidden
+  }
+  .ruleBtn:hover{transform:translateY(-2px);border-color:rgba(230,126,34,.5)}
+  .ruleBtn.active{
+    border-color:rgba(230,126,34,.85);
+    background:rgba(230,126,34,.10);
+  }
+  .ruleMeta{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .ruleCode{
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.10);
+    border-radius:999px;padding:6px 10px;font-size:12px;font-weight:900
+  }
+  .ruleName{font-size:14px}
+
+  /* quiz */
+  .card{
+    background:var(--card-bg);border:1px solid var(--card-border);
+    border-radius:20px;padding:22px 18px;backdrop-filter:blur(10px);
+    animation:cardEnter .5s ease-out;position:relative;overflow:hidden
+  }
+  .card::before{
+    content:'';position:absolute;top:0;right:0;left:0;height:3px;
+    background:linear-gradient(90deg,var(--accent),var(--accent-glow),var(--accent));
+  }
+  @keyframes cardEnter{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+  .progress{
+    margin:0 0 14px;
+  }
+  .pinfo{display:flex;justify-content:space-between;align-items:center;color:var(--text-muted);font-weight:700;font-size:13px;margin-bottom:8px}
+  .track{height:8px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+  .fill{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent-glow));
+    box-shadow:0 0 10px rgba(230,126,34,.4);transition:width .6s cubic-bezier(.25,.46,.45,.94)
+  }
+  .qnum{color:var(--accent);font-weight:900;font-size:12px;letter-spacing:.5px;margin-bottom:10px}
+  .qtext{font-size:18px;font-weight:800;line-height:1.7;margin-bottom:16px}
+  .opts{display:flex;flex-direction:column;gap:10px}
+  .opt{
+    width:100%;display:flex;gap:12px;align-items:center;text-align:right;
+    padding:14px 14px;border-radius:14px;cursor:pointer;
+    border:2px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04);
+    font-family:'Tajawal',sans-serif;color:var(--text);font-weight:600;font-size:15px;
+    transition:.25s;position:relative;overflow:hidden
+  }
+  .opt:hover:not(.disabled){border-color:var(--accent);background:rgba(230,126,34,.08);transform:translateX(-4px)}
+  .ico{
+    width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);font-weight:900
+  }
+  .opt.correct{border-color:var(--correct);background:var(--correct-bg)}
+  .opt.correct .ico{background:var(--correct);border-color:var(--correct);color:#fff}
+  .opt.wrong{border-color:var(--wrong);background:var(--wrong-bg);animation:shake .5s ease}
+  .opt.wrong .ico{background:var(--wrong);border-color:var(--wrong);color:#fff}
+  @keyframes shake{
+    0%,100%{transform:translateX(0)}
+    20%{transform:translateX(8px)}
+    40%{transform:translateX(-8px)}
+    60%{transform:translateX(6px)}
+    80%{transform:translateX(-4px)}
+  }
+  .disabled{pointer-events:none;opacity:.55}
+  .opt.correct.disabled,.opt.wrong.disabled{opacity:1}
+
+  .fb{display:none;margin-top:12px;padding:12px 14px;border-radius:14px;font-weight:800;line-height:1.7;font-size:14px}
+  .fb.ok{display:block;background:var(--correct-bg);border:1px solid rgba(39,174,96,.35);color:#2ecc71}
+  .fb.bad{display:block;background:var(--wrong-bg);border:1px solid rgba(231,76,60,.35);color:#e74c3c}
+  .next{
+    display:none;margin-top:12px;width:100%;border:none;border-radius:14px;
+    padding:14px;background:linear-gradient(135deg,var(--accent),#d35400);
+    color:#fff;font-weight:900;font-family:'Tajawal',sans-serif;font-size:16px;cursor:pointer;
+    box-shadow:0 4px 15px rgba(230,126,34,.3);transition:.25s
+  }
+  .next:hover{transform:translateY(-2px);box-shadow:0 6px 25px rgba(230,126,34,.45)}
+  .next.show{display:block}
+
+  /* results */
+  .results{display:none;text-align:center;animation:cardEnter .6s ease-out}
+  .results.show{display:block}
+  .circle{width:160px;height:160px;border-radius:50%;margin:0 auto 16px;display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative}
+  .circle::before{
+    content:'';position:absolute;inset:-4px;border-radius:50%;padding:4px;
+    background:conic-gradient(var(--accent) var(--pct), rgba(255,255,255,.10) var(--pct));
+    -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+    animation:circleReveal 1s ease-out
+  }
+  @keyframes circleReveal{from{opacity:0;transform:rotate(-90deg)}to{opacity:1;transform:rotate(0)}}
+  .big{font-size:44px;font-weight:900;color:var(--accent-glow)}
+  .small{color:var(--text-muted);font-weight:800}
+  .title{font-size:22px;font-weight:900;margin:6px 0}
+  .msg{color:var(--text-muted);font-weight:700;line-height:1.7;margin:0 auto 14px;max-width:520px}
+  .restart{
+    display:inline-flex;gap:10px;align-items:center;justify-content:center;
+    border:none;border-radius:14px;padding:12px 28px;
+    background:linear-gradient(135deg,var(--accent),#d35400);
+    color:#fff;font-weight:900;cursor:pointer;
+    box-shadow:0 4px 15px rgba(230,126,34,.3);transition:.25s
+  }
+  .restart:hover{transform:translateY(-2px);box-shadow:0 6px 25px rgba(230,126,34,.45)}
+  .summary{margin-top:14px;display:flex;flex-direction:column;gap:8px;text-align:right}
+  .sitem{
+    display:flex;gap:10px;align-items:center;padding:12px 12px;border-radius:14px;
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);font-weight:700;font-size:13px;line-height:1.6
+  }
+  .mark{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;flex-shrink:0}
+  .mark.ok{background:var(--correct-bg);color:var(--correct)}
+  .mark.bad{background:var(--wrong-bg);color:var(--wrong)}
+
+  /* mobile */
+  @media (max-width:560px){ .rules{grid-template-columns:1fr} h1{font-size:24px} .qtext{font-size:17px} }
+</style>
+</head>
+<body>
+
+<div class="bg-pattern"></div>
+
+<div class="app">
+  <div class="topbar">
+    <div class="brand">
+      <div class="sec">SEC | Life Saving Rules</div>
+      <div class="sub" id="subTitle">Interactive Safety Quiz</div>
+    </div>
+    <div class="controls">
+      <select id="langSel" onchange="setLang(this.value)">
+        <option value="ar" selected>العربية</option>
+        <option value="en">English</option>
+        <option value="ur">Urdu</option>
+        <option value="bn">বাংলা</option>
+      </select>
+      <button class="pill" onclick="toggleDir()">RTL/LTR</button>
+    </div>
+  </div>
+
+  <div class="header">
+    <div class="badge"><span class="num" id="ruleNum">01</span><span id="ruleTitle">عزل الطاقة</span></div>
+    <h1 id="mainTitle">اختبار قواعد إنقاذ الحياة</h1>
+    <div class="desc" id="mainDesc">التحقق من العزل وعدم وجود أي طاقة قبل بدء العمل</div>
+  </div>
+
+  <!-- Rules menu -->
+  <div class="rules" id="rulesMenu"></div>
+
+  <!-- Quiz -->
+  <div id="quizWrap" class="card">
+    <div class="progress">
+      <div class="pinfo">
+        <span id="counter">السؤال ١ من ٨</span>
+        <span id="scoreTxt">النقاط: ٠</span>
+      </div>
+      <div class="track"><div class="fill" id="fill"></div></div>
+    </div>
+
+    <div class="qnum" id="qlabel">السؤال الأول</div>
+    <div class="qtext" id="qtext"></div>
+    <div class="opts" id="opts"></div>
+    <div class="fb" id="fb"></div>
+    <button class="next" id="next" onclick="nextQ()">السؤال التالي ←</button>
+  </div>
+
+  <!-- Results -->
+  <div id="results" class="results card">
+    <div class="circle" id="circle">
+      <div class="big" id="rScore"></div>
+      <div class="small" id="rTotal"></div>
+    </div>
+    <div class="title" id="rTitle"></div>
+    <div class="msg" id="rMsg"></div>
+    <div class="summary" id="summary"></div>
+    <div style="margin-top:14px;">
+      <button class="restart" onclick="restart()">إعادة الاختبار ↺</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ===== helpers =====
+  const arabicNums = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+  function toArabic(n){ return String(n).split('').map(d => arabicNums[parseInt(d)] ?? d).join(''); }
+
+  const ordinalsAR = ['الأول','الثاني','الثالث','الرابع','الخامس','السادس','السابع','الثامن','التاسع','العاشر'];
+
+  // ===== i18n (simple + practical) =====
+  const I18N = {
+    ar: {
+      subTitle:"Interactive Safety Quiz",
+      mainTitle:"اختبار قواعد إنقاذ الحياة",
+      score:"النقاط: ",
+      next:"السؤال التالي ←",
+      restart:"إعادة الاختبار ↺",
+      qPrefix:"السؤال ",
+      of:"من",
+      titles:[
+        "عزل الطاقة",
+        "العمل على المرتفعات",
+        "رفع الأحمال",
+        "الأعمال الساخنة",
+        "الدخول للأماكن المغلقة",
+        "القيادة الآمنة",
+        "السلامة الكهربائية",
+        "الحفر والتنقيب",
+        "العزل/الحواجز ومناطق الخطر",
+        "معدات الوقاية وتقييم المخاطر"
+      ],
+      desc:[
+        "التحقق من العزل وعدم وجود أي طاقة قبل بدء العمل",
+        "الحماية من السقوط وربط الحزام وفحص نقاط التثبيت",
+        "التأكد من خطة الرفع، المعدات المعتمدة، ومنع المرور تحت الحمولة",
+        "تصريح عمل ساخن + عزل + مراقب نار + طفايات وتجهيز الموقع",
+        "تصريح + فحص غازات + مراقب + خطة إنقاذ + تهوية",
+        "السرعات، حزام الأمان، عدم الجوال، مسافة أمان",
+        "تصريح، عزل، اختبار، PPE، أدوات معزولة",
+        "تصريح حفر، كشف خدمات، تدعيم، عزل منطقة",
+        "منع الدخول لمنطقة الخطر ووضع الحواجز والإشارات",
+        "PPE الصحيح + تقييم المخاطر + STOP Work"
+      ]
+    },
+    en: {
+      subTitle:"Interactive Safety Quiz",
+      mainTitle:"Life Saving Rules Quiz",
+      score:"Score: ",
+      next:"Next Question →",
+      restart:"Restart ↺",
+      qPrefix:"Question ",
+      of:"of",
+      titles:[
+        "Energy Isolation (LOTO)",
+        "Working at Height",
+        "Lifting Operations",
+        "Hot Work",
+        "Confined Space Entry",
+        "Safe Driving",
+        "Electrical Safety",
+        "Excavation",
+        "Barriers & Exclusion Zones",
+        "PPE & Risk Assessment"
+      ],
+      desc:[
+        "Verify isolation & zero energy before starting work",
+        "Prevent falls: harness, anchorage, inspection",
+        "Plan lift, certified gear, no standing under load",
+        "Permit + isolate + fire watch + extinguishers",
+        "Permit + gas test + attendant + rescue plan + ventilation",
+        "Speed, seatbelt, no phone, safe distance",
+        "Permit, isolate, test, PPE, insulated tools",
+        "Permit, locate utilities, shoring, barricade",
+        "No entry into danger zone; barriers & signage",
+        "Right PPE + risk assessment + STOP Work"
+      ]
+    },
+    ur: {
+      subTitle:"Interactive Safety Quiz",
+      mainTitle:"Life Saving Rules Quiz",
+      score:"اسکور: ",
+      next:"اگلا سوال →",
+      restart:"دوبارہ شروع ↺",
+      qPrefix:"سوال ",
+      of:"میں سے",
+      titles:[
+        "توانائی کی تنہائی (LOTO)",
+        "اونچائی پر کام",
+        "لفٹنگ آپریشن",
+        "ہاٹ ورک",
+        "محدود جگہ میں داخلہ",
+        "محفوظ ڈرائیونگ",
+        "برقی حفاظت",
+        "کھدائی",
+        "بیریئرز اور خطرناک زون",
+        "PPE اور رسک اسیسمنٹ"
+      ],
+      desc:[
+        "کام سے پہلے آئسولیشن اور زیرو انرجی کی تصدیق",
+        "گرنے سے بچاؤ: ہارنس، اینکریج، انسپیکشن",
+        "لفٹنگ پلان، سرٹیفائیڈ سامان، لوڈ کے نیچے نہ جائیں",
+        "پرمنٹ + آئسولیشن + فائر واچ + فائر ایکسٹنگوئشر",
+        "پرمنٹ + گیس ٹیسٹ + اٹینڈنٹ + ریسکیو پلان + وینٹیلیشن",
+        "رفتار، سیٹ بیلٹ، فون نہیں، محفوظ فاصلہ",
+        "پرمنٹ، آئسولیشن، ٹیسٹ، PPE، انسولیٹڈ ٹولز",
+        "پرمنٹ، یوٹیلٹی لوکیٹ، شورنگ، بیریکیڈ",
+        "خطرناک زون میں داخلہ منع؛ بیریئرز اور سائن",
+        "درست PPE + رسک اسیسمنٹ + STOP Work"
+      ]
+    },
+    bn: {
+      subTitle:"Interactive Safety Quiz",
+      mainTitle:"Life Saving Rules Quiz",
+      score:"স্কোর: ",
+      next:"পরের প্রশ্ন →",
+      restart:"আবার শুরু ↺",
+      qPrefix:"প্রশ্ন ",
+      of:"এর মধ্যে",
+      titles:[
+        "এনার্জি আইসোলেশন (LOTO)",
+        "উঁচুতে কাজ",
+        "লিফটিং অপারেশন",
+        "হট ওয়ার্ক",
+        "কনফাইন্ড স্পেস এন্ট্রি",
+        "নিরাপদ ড্রাইভিং",
+        "ইলেকট্রিক্যাল সেফটি",
+        "এক্সক্যাভেশন",
+        "বাধা ও ঝুঁকিপূর্ণ এলাকা",
+        "PPE ও রিস্ক অ্যাসেসমেন্ট"
+      ],
+      desc:[
+        "কাজ শুরুর আগে আইসোলেশন ও জিরো এনার্জি যাচাই",
+        "পড়ে যাওয়া প্রতিরোধ: হারনেস, অ্যাঙ্করেজ, ইন্সপেকশন",
+        "লিফট প্ল্যান, সার্টিফাইড গিয়ার, লোডের নিচে নয়",
+        "পারমিট + আইসোলেশন + ফায়ার ওয়াচ + এক্সটিংগুইশার",
+        "পারমিট + গ্যাস টেস্ট + অ্যাটেন্ডেন্ট + রেসকিউ প্ল্যান + ভেন্টিলেশন",
+        "গতি, সিটবেল্ট, ফোন নয়, সেফ ডিস্ট্যান্স",
+        "পারমিট, আইসোলেশন, টেস্ট, PPE, ইনসুলেটেড টুল",
+        "পারমিট, ইউটিলিটি লোকেট, শোরিং, ব্যারিকেড",
+        "ঝুঁকিপূর্ণ এলাকায় প্রবেশ নিষেধ; ব্যারিয়ার ও সাইন",
+        "সঠিক PPE + রিস্ক অ্যাসেসমেন্ট + STOP Work"
+      ]
+    }
+  };
+
+  // ===== rules + quizzes =====
+  // Rule 01 filled (your 8 questions). Other rules are placeholders (you can fill later in same structure).
+  const RULES = [
+    {
+      code:"01",
+      key:"r01",
+      quiz: [
+        {
+          q_ar:"قبل بدء العمل على معدات كهربائية، ما أول خطوة يجب اتخاذها؟",
+          q_en:"Before working on electrical equipment, what is the first step?",
+          q_ur:"برقی آلات پر کام سے پہلے پہلا قدم کیا ہے؟",
+          q_bn:"ইলেকট্রিক্যাল সরঞ্জামে কাজ শুরুর আগে প্রথম ধাপ কী?",
+          options_ar:["البدء بالعمل فوراً لتوفير الوقت","تحديد جميع مصادر الطاقة المتصلة بالمعدات","ارتداء القفازات فقط والبدء بالعمل","سؤال زميل إذا كانت الطاقة مفصولة"],
+          options_en:["Start work immediately to save time","Identify all energy sources connected to the equipment","Wear gloves only and start work","Ask a colleague if power is off"],
+          options_ur:["وقت بچانے کیلئے فوراً کام شروع کریں","تمام توانائی کے ذرائع شناخت کریں","صرف دستانے پہن کر کام شروع کریں","کسی ساتھی سے پوچھیں کہ بجلی بند ہے؟"],
+          options_bn:["সময় বাঁচাতে সাথে সাথে কাজ শুরু করা","সরঞ্জামের সাথে সংযুক্ত সব এনার্জি সোর্স শনাক্ত করা","শুধু গ্লাভস পরে কাজ শুরু করা","সহকর্মীকে জিজ্ঞেস করা বিদ্যুৎ বন্ধ কিনা"],
+          correct:1,
+          ok_ar:"✓ صحيح! يجب دائماً تحديد جميع مصادر الطاقة كخطوة أولى قبل أي عمل.",
+          bad_ar:"✗ خطأ! الخطوة الأولى هي تحديد جميع مصادر الطاقة المتصلة بالمعدات.",
+          ok_en:"✓ Correct! Always identify all energy sources as the first step.",
+          bad_en:"✗ Wrong! The first step is identifying all energy sources connected to the equipment.",
+          ok_ur:"✓ درست! پہلا قدم ہمیشہ تمام توانائی کے ذرائع شناخت کرنا ہے۔",
+          bad_ur:"✗ غلط! پہلا قدم تمام توانائی کے ذرائع شناخت کرنا ہے۔",
+          ok_bn:"✓ সঠিক! প্রথমে সব এনার্জি সোর্স শনাক্ত করতে হবে।",
+          bad_bn:"✗ ভুল! প্রথম ধাপ হলো সব এনার্জি সোর্স শনাক্ত করা।"
+        },
+        {
+          q_ar:"بعد عزل مصادر الطاقة، ما الإجراء الصحيح؟",
+          q_en:"After isolating energy sources, what is the correct action?",
+          q_ur:"توانائی آئسولیٹ کرنے کے بعد درست اقدام کیا ہے؟",
+          q_bn:"এনার্জি আইসোলেট করার পর সঠিক কাজ কী?",
+          options_ar:["وضع الأقفال والبطاقات التحذيرية على نقاط العزل","ترك نقاط العزل مفتوحة ليراها الجميع","إبلاغ المشرف شفهياً فقط","كتابة ملاحظة على ورقة وتركها بجانب المعدة"],
+          options_en:["Apply locks and warning tags on isolation points","Leave isolation points open for everyone to see","Only inform the supervisor verbally","Write a note and leave it next to the equipment"],
+          options_ur:["آئسولیشن پوائنٹس پر لاک اور ٹیگ لگائیں","آئسولیشن پوائنٹس کھلے چھوڑ دیں","صرف زبانی طور پر سپروائزر کو بتائیں","کاغذ پر نوٹ لکھ کر پاس رکھ دیں"],
+          options_bn:["আইসোলেশন পয়েন্টে লক ও ট্যাগ লাগানো","সবাই দেখবে বলে পয়েন্ট খোলা রাখা","শুধু সুপারভাইজারকে বলা","কাগজে নোট লিখে পাশে রাখা"],
+          correct:0,
+          ok_ar:"✓ صحيح! يجب وضع الأقفال وعلامات البطاقات التحذيرية على جميع نقاط العزل.",
+          bad_ar:"✗ خطأ! يجب وضع الأقفال والبطاقات التحذيرية على نقاط العزل لضمان عدم إعادة تشغيل الطاقة.",
+          ok_en:"✓ Correct! Apply locks and warning tags on all isolation points.",
+          bad_en:"✗ Wrong! Locks and tags prevent unexpected re-energization.",
+          ok_ur:"✓ درست! تمام آئسولیشن پوائنٹس پر لاک اور ٹیگ لگائیں۔",
+          bad_ur:"✗ غلط! لاک اور ٹیگ غیر متوقع طور پر توانائی واپس آنے سے روکتے ہیں۔",
+          ok_bn:"✓ সঠিক! সব আইসোলেশন পয়েন্টে লক ও ট্যাগ লাগাতে হবে।",
+          bad_bn:"✗ ভুল! লক ও ট্যাগ না থাকলে কেউ আবার চালু করতে পারে।"
+        },
+        {
+          q_ar:"ما المقصود بالطاقة المتبقية أو المخزنة؟",
+          q_en:"What does residual/stored energy mean?",
+          q_ur:"باقی/محفوظ شدہ توانائی سے کیا مراد ہے؟",
+          q_bn:"রেসিডুয়াল/স্টোর্ড এনার্জি বলতে কী বোঝায়?",
+          options_ar:["الطاقة التي تبقى في النظام حتى بعد فصل المصدر الرئيسي","الطاقة الكهربائية في الشبكة العامة","طاقة البطاريات الاحتياطية فقط","لا يوجد شيء اسمه طاقة متبقية"],
+          options_en:["Energy remaining in the system even after the main source is disconnected","Grid power only","Backup battery power only","There is no such thing"],
+          options_ur:["مین سورس بند کرنے کے بعد بھی سسٹم میں باقی توانائی","صرف گرڈ کی بجلی","صرف بیک اپ بیٹری","ایسا کچھ نہیں"],
+          options_bn:["মেইন সোর্স বন্ধের পরও সিস্টেমে থাকা শক্তি","শুধু গ্রিড পাওয়ার","শুধু ব্যাকআপ ব্যাটারি","এমন কিছু নেই"],
+          correct:0,
+          ok_ar:"✓ صحيح! الطاقة المتبقية هي الطاقة التي تبقى مخزنة في النظام مثل الضغط أو الحرارة أو الشحنة الكهربائية.",
+          bad_ar:"✗ خطأ! الطاقة المتبقية هي الطاقة التي تبقى في النظام حتى بعد فصل المصدر الرئيسي، ويجب التحقق منها دائماً.",
+          ok_en:"✓ Correct! Stored energy can remain (pressure, heat, electrical charge).",
+          bad_en:"✗ Wrong! Residual energy may remain after isolation and must be verified.",
+          ok_ur:"✓ درست! ذخیرہ شدہ توانائی (پریشر، گرمی، برقی چارج) باقی رہ سکتی ہے۔",
+          bad_ur:"✗ غلط! آئسولیشن کے بعد بھی توانائی باقی رہ سکتی ہے، ہمیشہ چیک کریں۔",
+          ok_bn:"✓ সঠিক! চাপ, তাপ, চার্জ ইত্যাদি শক্তি সিস্টেমে থেকে যেতে পারে।",
+          bad_bn:"✗ ভুল! আইসোলেশনের পরও শক্তি থাকতে পারে—সবসময় যাচাই করুন।"
+        },
+        {
+          q_ar:"أي من التالي يُعتبر تصرفاً خاطئاً عند عزل الطاقة؟",
+          q_en:"Which is a wrong behavior when isolating energy?",
+          q_ur:"توانائی آئسولیٹ کرتے وقت کون سا عمل غلط ہے؟",
+          q_bn:"এনার্জি আইসোলেশনে কোনটি ভুল আচরণ?",
+          options_ar:["اختبار المعدات للتأكد من عدم وجود طاقة","وضع القفل الشخصي على نقطة العزل","الاعتماد على شخص آخر لعزل الطاقة دون التحقق بنفسك","تحديد جميع مصادر الطاقة قبل العمل"],
+          options_en:["Test equipment to confirm zero energy","Apply your personal lock","Rely on someone else without verifying yourself","Identify all energy sources before work"],
+          options_ur:["زیرو انرجی کی تصدیق کیلئے ٹیسٹ","اپنا ذاتی لاک لگانا","خود تصدیق کیے بغیر دوسروں پر انحصار","تمام توانائی کے ذرائع شناخت"],
+          options_bn:["জিরো এনার্জি যাচাই করা","নিজের পার্সোনাল লক লাগানো","নিজে যাচাই না করে অন্যের উপর নির্ভর করা","সব এনার্জি সোর্স শনাক্ত করা"],
+          correct:2,
+          ok_ar:"✓ صحيح! يجب عليك دائماً التحقق بنفسك من العزل وعدم الاعتماد على الآخرين فقط.",
+          bad_ar:"✗ خطأ! الاعتماد على شخص آخر دون التحقق بنفسك هو تصرف خاطئ وخطير.",
+          ok_en:"✓ Correct! Always verify isolation yourself; don't rely only on others.",
+          bad_en:"✗ Wrong! Relying on others without verification is unsafe.",
+          ok_ur:"✓ درست! ہمیشہ خود تصدیق کریں، صرف دوسروں پر انحصار نہ کریں۔",
+          bad_ur:"✗ غلط! خود تصدیق کے بغیر دوسروں پر انحصار خطرناک ہے۔",
+          ok_bn:"✓ সঠিক! নিজে যাচাই করতে হবে—শুধু অন্যের উপর নির্ভর নয়।",
+          bad_bn:"✗ ভুল! নিজে যাচাই না করে অন্যের উপর নির্ভর করা বিপজ্জনক।"
+        },
+        {
+          q_ar:"متى يجب التحقق من عدم تسرب أو وجود أي طاقة متبقية؟",
+          q_en:"When should you verify there is no residual energy?",
+          q_ur:"باقی توانائی کی تصدیق کب کریں؟",
+          q_bn:"রেসিডুয়াল এনার্জি না থাকার যাচাই কখন করবেন?",
+          options_ar:["بعد الانتهاء من العمل فقط","فقط عند العمل على معدات كهربائية","قبل بدء العمل وبعد عزل جميع مصادر الطاقة","ليس ضرورياً إذا تم وضع الأقفال"],
+          options_en:["Only after finishing work","Only when working on electrical equipment","Before starting work after isolating all energy sources","Not necessary if locks are applied"],
+          options_ur:["صرف کام ختم ہونے کے بعد","صرف برقی کام میں","کام شروع کرنے سے پہلے، تمام سورس آئسولیٹ کرنے کے بعد","لاک لگ گیا تو ضروری نہیں"],
+          options_bn:["শুধু কাজ শেষের পরে","শুধু ইলেকট্রিক্যাল কাজে","কাজ শুরুর আগে—সব সোর্স আইসোলেট করার পর","লক থাকলে দরকার নেই"],
+          correct:2,
+          ok_ar:"✓ صحيح! يجب التحقق من عدم وجود طاقة متبقية قبل بدء العمل وبعد إتمام العزل.",
+          bad_ar:"✗ خطأ! يجب التحقق من عدم وجود طاقة متبقية قبل بدء العمل وبعد عزل جميع المصادر.",
+          ok_en:"✓ Correct! Verify zero residual energy before work after isolation.",
+          bad_en:"✗ Wrong! Always verify there is no residual energy after isolation.",
+          ok_ur:"✓ درست! آئسولیشن کے بعد کام سے پہلے زیرو انرجی چیک کریں۔",
+          bad_ur:"✗ غلط! آئسولیشن کے بعد بھی باقی توانائی ہو سکتی ہے—چیک کریں۔",
+          ok_bn:"✓ সঠিক! আইসোলেশনের পর কাজ শুরুর আগে জিরো এনার্জি যাচাই।",
+          bad_bn:"✗ ভুল! আইসোলেশনের পরও এনার্জি থাকতে পারে—যাচাই জরুরি।"
+        },
+        {
+          q_ar:"أي من هذه المصادر يجب تحديدها عند عزل الطاقة؟",
+          q_en:"Which sources must be identified during isolation?",
+          q_ur:"آئسولیشن میں کن ذرائع کی شناخت ضروری ہے؟",
+          q_bn:"আইসোলেশনে কোন সোর্সগুলো শনাক্ত করতে হবে?",
+          options_ar:["الكهرباء فقط","جميع مصادر الطاقة: كهربائية، ميكانيكية، هيدروليكية، حرارية، وغيرها","الطاقة الكهربائية والميكانيكية فقط","المصادر التي يحددها المشرف فقط"],
+          options_en:["Electrical only","All energy sources: electrical, mechanical, hydraulic, thermal, etc.","Electrical and mechanical only","Only what the supervisor mentions"],
+          options_ur:["صرف بجلی","تمام ذرائع: برقی، مکینیکل، ہائیڈرولک، تھرمل وغیرہ","صرف برقی اور مکینیکل","صرف وہ جو سپروائزر کہے"],
+          options_bn:["শুধু বিদ্যুৎ","সব এনার্জি সোর্স: ইলেকট্রিক্যাল, মেকানিক্যাল, হাইড্রোলিক, থার্মাল ইত্যাদি","শুধু ইলেকট্রিক্যাল ও মেকানিক্যাল","শুধু সুপারভাইজার যা বলে"],
+          correct:1,
+          ok_ar:"✓ صحيح! يجب تحديد جميع مصادر الطاقة بدون استثناء.",
+          bad_ar:"✗ خطأ! يجب تحديد جميع مصادر الطاقة بما فيها الكهربائية والميكانيكية والهيدروليكية والحرارية وغيرها.",
+          ok_en:"✓ Correct! Identify ALL sources without exception.",
+          bad_en:"✗ Wrong! Identify all energy sources (electrical, mechanical, hydraulic, thermal, etc.).",
+          ok_ur:"✓ درست! تمام توانائی کے ذرائع کی شناخت ضروری ہے۔",
+          bad_ur:"✗ غلط! برقی، مکینیکل، ہائیڈرولک، تھرمل—سب کی شناخت کریں۔",
+          ok_bn:"✓ সঠিক! সব ধরনের এনার্জি সোর্স শনাক্ত করতে হবে।",
+          bad_bn:"✗ ভুল! ইলেকট্রিক্যাল/মেকানিক্যাল/হাইড্রোলিক/থার্মাল—সব শনাক্ত করুন।"
+        },
+        {
+          q_ar:"ما الهدف من وضع البطاقات التحذيرية على نقاط العزل؟",
+          q_en:"What is the purpose of warning tags on isolation points?",
+          q_ur:"آئسولیشن پوائنٹس پر ٹیگ کا مقصد کیا ہے؟",
+          q_bn:"আইসোলেশন পয়েন্টে ওয়ার্নিং ট্যাগ কেন লাগে?",
+          options_ar:["لتزيين المعدات وجعلها مميزة","لتحذير الآخرين من إعادة تشغيل الطاقة أثناء العمل","لتسجيل وقت بدء العمل فقط","ليست ضرورية إذا كان القفل موجوداً"],
+          options_en:["To decorate equipment","To warn others not to re-energize during work","Only to record start time","Not needed if a lock exists"],
+          options_ur:["سجانے کیلئے","دوسروں کو خبردار کرنا کہ توانائی واپس نہ کریں","صرف وقت لکھنے کیلئے","لاک ہو تو ضروری نہیں"],
+          options_bn:["সাজানোর জন্য","কাজ চলাকালীন কেউ যেন আবার চালু না করে—সতর্ক করা","শুধু শুরুর সময় লিখতে","লক থাকলে দরকার নেই"],
+          correct:1,
+          ok_ar:"✓ صحيح! البطاقات التحذيرية تحذر الآخرين من إعادة تشغيل الطاقة وتحمي العاملين.",
+          bad_ar:"✗ خطأ! الهدف من البطاقات التحذيرية هو تحذير الآخرين من إعادة تشغيل الطاقة أثناء العمل.",
+          ok_en:"✓ Correct! Tags warn others not to re-energize and protect workers.",
+          bad_en:"✗ Wrong! Tags exist to prevent re-energization during work.",
+          ok_ur:"✓ درست! ٹیگز دوسروں کو خبردار کرتے ہیں کہ توانائی واپس نہ کریں۔",
+          bad_ur:"✗ غلط! ٹیگز کا مقصد دوبارہ توانائی لگنے سے روکنا ہے۔",
+          ok_bn:"✓ সঠিক! ট্যাগ অন্যদের সতর্ক করে যাতে কেউ আবার চালু না করে।",
+          bad_bn:"✗ ভুল! ট্যাগের উদ্দেশ্য রি-এনার্জাইজেশন বন্ধ করা।"
+        },
+        {
+          q_ar:"أي من التالي يُعتبر من الممارسات الصحيحة لعزل الطاقة؟",
+          q_en:"Which is the correct isolation practice?",
+          q_ur:"توانائی آئسولیشن کی درست پریکٹس کون سی ہے؟",
+          q_bn:"সঠিক আইসোলেশন প্র্যাকটিস কোনটি?",
+          options_ar:["فصل مفتاح الطاقة الرئيسي فقط والبدء بالعمل","عزل الطاقة ثم وضع الأقفال والبطاقات واختبار عدم وجود طاقة متبقية","طلب من شخص آخر أن يمسك المفتاح بيده","العمل بسرعة قبل أن يعيد أحد تشغيل الطاقة"],
+          options_en:["Switch off main power only and start work","Isolate → lock/tag → verify zero residual energy","Ask someone to hold the switch by hand","Work fast before someone turns it on"],
+          options_ur:["صرف مین سوئچ بند کر کے کام شروع","آئسولیٹ → لاک/ٹیگ → زیرو انرجی ٹیسٹ","کسی سے کہیں ہاتھ سے سوئچ پکڑے","کسی کے آن کرنے سے پہلے جلدی کریں"],
+          options_bn:["শুধু মেইন সুইচ অফ করে কাজ শুরু","আইসোলেট → লক/ট্যাগ → জিরো এনার্জি যাচাই","কাউকে সুইচ হাতে ধরে রাখতে বলা","কেউ চালু করার আগে দ্রুত কাজ"],
+          correct:1,
+          ok_ar:"✓ صحيح! الممارسة الصحيحة تشمل العزل ثم القفل والبطاقة ثم اختبار عدم وجود طاقة.",
+          bad_ar:"✗ خطأ! الممارسة الصحيحة هي: عزل الطاقة → وضع الأقفال والبطاقات → اختبار عدم وجود طاقة متبقية.",
+          ok_en:"✓ Correct! Isolate → lock/tag → verify zero energy.",
+          bad_en:"✗ Wrong! Correct sequence: isolate → lock/tag → verify zero energy.",
+          ok_ur:"✓ درست! درست ترتیب: آئسولیٹ → لاک/ٹیگ → زیرو انرجی ٹیسٹ۔",
+          bad_ur:"✗ غلط! صحیح ترتیب یہی ہے: آئسولیٹ → لاک/ٹیگ → ٹیسٹ۔",
+          ok_bn:"✓ সঠিক! সঠিক ধাপ: আইসোলেট → লক/ট্যাগ → জিরো এনার্জি যাচাই।",
+          bad_bn:"✗ ভুল! সঠিক ধাপ: আইসোলেট → লক/ট্যাগ → যাচাই।"
+        }
+      ]
+    },
+
+    // Placeholders for rules 02-10 (add questions later)
+    { code:"02", key:"r02", quiz: [] },
+    { code:"03", key:"r03", quiz: [] },
+    { code:"04", key:"r04", quiz: [] },
+    { code:"05", key:"r05", quiz: [] },
+    { code:"06", key:"r06", quiz: [] },
+    { code:"07", key:"r07", quiz: [] },
+    { code:"08", key:"r08", quiz: [] },
+    { code:"09", key:"r09", quiz: [] },
+    { code:"10", key:"r10", quiz: [] }
+  ];
+
+  // ===== state =====
+  let lang = "ar";
+  let activeRule = 0;
+  let qIndex = 0;
+  let score = 0;
+  let answers = [];
+
+  // ===== UI refs =====
+  const rulesMenu = document.getElementById("rulesMenu");
+  const ruleNum = document.getElementById("ruleNum");
+  const ruleTitle = document.getElementById("ruleTitle");
+  const mainTitle = document.getElementById("mainTitle");
+  const mainDesc = document.getElementById("mainDesc");
+  const subTitle = document.getElementById("subTitle");
+
+  const counter = document.getElementById("counter");
+  const scoreTxt = document.getElementById("scoreTxt");
+  const fill = document.getElementById("fill");
+  const qlabel = document.getElementById("qlabel");
+  const qtext = document.getElementById("qtext");
+  const opts = document.getElementById("opts");
+  const fb = document.getElementById("fb");
+  const next = document.getElementById("next");
+  const quizWrap = document.getElementById("quizWrap");
+
+  const results = document.getElementById("results");
+  const circle = document.getElementById("circle");
+  const rScore = document.getElementById("rScore");
+  const rTotal = document.getElementById("rTotal");
+  const rTitle = document.getElementById("rTitle");
+  const rMsg = document.getElementById("rMsg");
+  const summary = document.getElementById("summary");
+
+  function setLang(newLang){
+    lang = newLang;
+    const t = I18N[lang];
+    subTitle.textContent = t.subTitle;
+    mainTitle.textContent = t.mainTitle;
+    buildRulesMenu();
+    loadRule(activeRule, true);
+  }
+
+  function toggleDir(){
+    const html = document.documentElement;
+    const isRTL = html.getAttribute("dir") === "rtl";
+    html.setAttribute("dir", isRTL ? "ltr" : "rtl");
+    html.setAttribute("lang", isRTL ? "en" : "ar");
+  }
+
+  function buildRulesMenu(){
+    rulesMenu.innerHTML = "";
+    const t = I18N[lang];
+    RULES.forEach((r, idx) => {
+      const btn = document.createElement("button");
+      btn.className = "ruleBtn" + (idx===activeRule ? " active" : "");
+      btn.onclick = () => loadRule(idx, true);
+
+      btn.innerHTML = `
+        <div class="ruleMeta">
+          <span class="ruleCode">${r.code}</span>
+          <span style="opacity:.85;font-size:12px;font-weight:900">${(r.quiz?.length || 0)} Q</span>
+        </div>
+        <div class="ruleName">${t.titles[idx]}</div>
+      `;
+      rulesMenu.appendChild(btn);
+    });
+  }
+
+  function loadRule(idx, resetAll){
+    activeRule = idx;
+    const t = I18N[lang];
+    ruleNum.textContent = RULES[idx].code;
+    ruleTitle.textContent = t.titles[idx];
+    mainDesc.textContent = t.desc[idx];
+
+    // active style
+    document.querySelectorAll(".ruleBtn").forEach((b,i)=> b.classList.toggle("active", i===idx));
+
+    // reset
+    qIndex = 0; score = 0; answers = [];
+    scoreTxt.textContent = t.score + (lang==="ar" ? toArabic(score) : score);
+
+    // show quiz
+    results.classList.remove("show");
+    quizWrap.style.display = "block";
+
+    if ((RULES[idx].quiz?.length || 0) === 0){
+      // empty rule placeholder
+      qlabel.textContent = (lang==="ar" ? "تنبيه" : "Notice");
+      qtext.textContent = (lang==="ar"
+        ? "هذه القاعدة جاهزة كهيكل. أضف أسئلة القاعدة هنا (مثل قاعدة 01)."
+        : "This rule is a ready template. Add questions here like Rule 01.");
+      opts.innerHTML = "";
+      fb.className = "fb bad";
+      fb.textContent = (lang==="ar"
+        ? "⚠️ لا توجد أسئلة لهذه القاعدة حالياً."
+        : "⚠️ No questions are available for this rule yet.");
+      next.className = "next";
+      fill.style.width = "0%";
+      counter.textContent = "";
+      return;
+    }
+
+    renderQ();
+  }
+
+  function getQ(){
+    return RULES[activeRule].quiz[qIndex];
+  }
+
+  function renderQ(){
+    const t = I18N[lang];
+    const quiz = RULES[activeRule].quiz;
+    const total = quiz.length;
+
+    const q = getQ();
+    // question in selected language
+    const qText = q["q_"+lang] || q.q_ar;
+
+    counter.textContent = `${t.qPrefix}${(lang==="ar"?toArabic(qIndex+1):(qIndex+1))} ${t.of} ${(lang==="ar"?toArabic(total):total)}`;
+    fill.style.width = ((qIndex/total)*100) + "%";
+    qlabel.textContent = (lang==="ar" ? `السؤال ${ordinalsAR[qIndex] || ""}` : `Question ${qIndex+1}`);
+    qtext.textContent = qText;
+
+    fb.className = "fb";
+    fb.textContent = "";
+    next.className = "next";
+    opts.innerHTML = "";
+
+    const labels = (lang==="ar") ? ["أ","ب","ج","د"] : ["A","B","C","D"];
+    const options = q["options_"+lang] || q.options_ar;
+
+    options.forEach((opt, i) => {
+      const b = document.createElement("button");
+      b.className = "opt";
+      b.innerHTML = `<span class="ico">${labels[i] || ""}</span><span>${opt}</span>`;
+      b.onclick = () => select(i);
+      opts.appendChild(b);
+    });
+  }
+
+  function select(i){
+    const q = getQ();
+    const isCorrect = (i === q.correct);
+    const buttons = document.querySelectorAll(".opt");
+
+    buttons.forEach((b, idx) => {
+      b.classList.add("disabled");
+      if (idx === q.correct) b.classList.add("correct");
+      else if (idx === i && !isCorrect) b.classList.add("wrong");
+    });
+
+    if (isCorrect) score++;
+
+    // feedback per language
+    const ok = q["ok_"+lang] || q.ok_ar;
+    const bad = q["bad_"+lang] || q.bad_ar;
+
+    fb.className = "fb " + (isCorrect ? "ok" : "bad");
+    fb.textContent = isCorrect ? ok : bad;
+
+    answers.push({qIndex, selected:i, correct:isCorrect});
+    const t = I18N[lang];
+    scoreTxt.textContent = t.score + (lang==="ar" ? toArabic(score) : score);
+    next.textContent = t.next;
+    next.className = "next show";
+  }
+
+  function nextQ(){
+    qIndex++;
+    const quiz = RULES[activeRule].quiz;
+    if (qIndex < quiz.length){
+      quizWrap.style.animation = "none"; void quizWrap.offsetHeight;
+      quizWrap.style.animation = "cardEnter .5s ease-out";
+      renderQ();
+    } else {
+      showResults();
+    }
+  }
+
+  function showResults(){
+    quizWrap.style.display = "none";
+    results.classList.add("show");
+
+    const t = I18N[lang];
+    const total = RULES[activeRule].quiz.length;
+    const pct = Math.round((score/total)*100);
+
+    circle.style.setProperty("--pct", pct + "%");
+    rScore.textContent = (lang==="ar" ? toArabic(score) : score);
+    rTotal.textContent = (lang==="ar" ? ("من " + toArabic(total)) : ("of " + total));
+
+    // message
+    if (pct === 100){
+      rTitle.textContent = (lang==="ar" ? "ممتاز! درجة كاملة 🏆" : "Excellent! Perfect score 🏆");
+      rMsg.textContent = (lang==="ar"
+        ? "ملتزم تماماً بقواعد السلامة. استمر بهذا المستوى."
+        : "You’re fully aligned with safety rules. Keep it up!");
+    } else if (pct >= 75){
+      rTitle.textContent = (lang==="ar" ? "أداء جيد جداً 👏" : "Very good 👏");
+      rMsg.textContent = (lang==="ar"
+        ? "راجع الأخطاء لتعزيز المعرفة قبل العمل."
+        : "Review the incorrect answers to strengthen knowledge.");
+    } else if (pct >= 50){
+      rTitle.textContent = (lang==="ar" ? "تحتاج لمراجعة 📖" : "Needs review 📖");
+      rMsg.textContent = (lang==="ar"
+        ? "يوصى بمراجعة القاعدة وإعادة الاختبار."
+        : "Please review the rule and retake the quiz.");
+    } else {
+      rTitle.textContent = (lang==="ar" ? "يجب إعادة التدريب ⚠️" : "Retraining required ⚠️");
+      rMsg.textContent = (lang==="ar"
+        ? "سلامتك أولاً. راجع القاعدة بالكامل قبل العمل."
+        : "Safety first. Review the rule fully before working.");
+    }
+
+    // summary
+    summary.innerHTML = "";
+    answers.forEach(a=>{
+      const item = document.createElement("div");
+      item.className = "sitem";
+      const mark = document.createElement("div");
+      mark.className = "mark " + (a.correct ? "ok":"bad");
+      mark.textContent = a.correct ? "✓" : "✗";
+      const text = document.createElement("div");
+      const q = RULES[activeRule].quiz[a.qIndex];
+      text.textContent = (q["q_"+lang] || q.q_ar);
+      item.appendChild(mark);
+      item.appendChild(text);
+      summary.appendChild(item);
+    });
+  }
+
+  function restart(){
+    loadRule(activeRule, true);
+  }
+
+  // init
+  buildRulesMenu();
+  loadRule(0, true);
+</script>
+
+</body>
+</html>
